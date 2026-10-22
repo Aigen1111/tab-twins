@@ -41,7 +41,6 @@ Todo se guarda **solo en local** y se borra cuando ya no queda ninguna pestaña 
 - Chrome solo puede capturar la pestaña **visible** de cada ventana: las pestañas que no has visitado desde que instalaste la extensión no tienen captura hasta que pulsas «Capturar» o «Actualizar capturas» (las activa un momento).
 - El scroll de pestañas abiertas antes de instalar la extensión y que estén dormidas aparece «Sin datos» hasta que las recargas.
 - La detección de «misma obra» es heurística: webs con URLs poco habituales pueden no agruparse.
-
 - En Firefox, pestañas con la misma URL en contenedores distintos se tratan como duplicadas.
 
 ## Desarrollo

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab Twins · Duplicadas</title>
+  <link rel="stylesheet" href="../ui/base.css">
+  <link rel="stylesheet" href="manager.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">
+        <h1>Tab Twins</h1>
+        <p id="stats" class="muted"></p>
+      </div>
+      <div class="bulk">
+        <button id="close-selected" class="btn danger" disabled>Cerrar seleccionadas (0)</button>
+        <button id="close-all-dupes" class="btn primary" disabled>Cerrar todas las duplicadas (0)</button>
+      </div>
+    </div>
+    <div class="top-row filters">
+      <input id="q" type="search" placeholder="Filtrar por título o web…" autocomplete="off">
+      <select id="f-window" aria-label="Ventana"></select>
+      <select id="f-tabgroup" aria-label="Grupo de pestañas"></select>
+      <select id="f-kind" aria-label="Tipo">
+        <option value="all">Idénticas y misma obra</option>
+        <option value="exact">Solo idénticas</option>
+        <option value="similar">Solo misma obra</option>
+      </select>
+      <span class="spacer"></span>
+      <label class="field">Al cerrar duplicadas, conservar
+        <select id="keep-rule"></select>
+      </label>
+      <label class="field toggle"><input id="auto-capture" type="checkbox"> Capturas automáticas</label>
+    </div>
+  </header>
+
+  <div id="access" class="access" hidden>
+    <span>Sin acceso a las webs no se pueden hacer capturas ni saber cuánto llevas leído.</span>
+    <button id="grant-access" class="btn small primary">Dar acceso</button>
+  </div>
+
+  <main id="groups" class="groups"></main>
+
+  <div id="compare" class="overlay" hidden></div>
+  <dialog id="confirm" class="confirm"></dialog>
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="manager.js"></script>
+</body>
+</html>

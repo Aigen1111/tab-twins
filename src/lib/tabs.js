@@ -50,11 +50,18 @@ export async function reopenTabs(restore) {
       pinned: t.pinned,
       active: false,
     });
-    if (sameWindow && t.groupId > -1) {
+    if (sameWindow && t.groupId > -1 && chrome.tabs.group) {
       await chrome.tabs.group({ tabIds: created.id, groupId: t.groupId }).catch(() => {});
     }
   }
 }
+
+// Acceso a las webs: sin él no hay capturas ni scroll. En Firefox el usuario
+// puede no concederlo al instalar, y en ambos navegadores puede retirarlo.
+const ALL_SITES = { origins: ['<all_urls>'] };
+export const hasSiteAccess = () => chrome.permissions.contains(ALL_SITES);
+/** Debe llamarse desde un clic del usuario. */
+export const requestSiteAccess = () => chrome.permissions.request(ALL_SITES);
 
 /** Abre el gestor o reutiliza su pestaña si ya está abierto. */
 export async function openManager(search = '') {

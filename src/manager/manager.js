@@ -5,10 +5,12 @@ import {
   closeTabs,
   escapeHtml as h,
   focusTab,
+  hasSiteAccess,
   loadSnapshot,
   matchesQuery,
   readLiveScroll,
   reopenTabs,
+  requestSiteAccess,
   timeAgo,
 } from '../lib/tabs.js';
 
@@ -483,6 +485,21 @@ chrome.storage.onChanged.addListener((changes, area) => {
   else if (state.compareIds && keys.some((k) => k.startsWith('shot:'))) renderCompare();
 });
 
+// ---------- Acceso a las webs ----------
+
+async function renderAccess() {
+  $('access').hidden = await hasSiteAccess();
+}
+
+$('grant-access').addEventListener('click', async () => {
+  if (await requestSiteAccess()) {
+    $('access').hidden = true;
+    showToast('Acceso concedido. Las capturas y el scroll empezarán a guardarse.');
+  }
+});
+chrome.permissions.onAdded.addListener(renderAccess);
+chrome.permissions.onRemoved.addListener(renderAccess);
+
 // ---------- Inicio ----------
 
 state.settings = await getSettings();
@@ -492,6 +509,7 @@ $('keep-rule').innerHTML = Object.entries(KEEP_RULES)
   .join('');
 $('auto-capture').checked = state.settings.autoCapture;
 
+await renderAccess();
 await refresh();
 
 const compareParam = Number(new URLSearchParams(location.search).get('compare'));

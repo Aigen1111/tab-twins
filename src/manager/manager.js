@@ -107,7 +107,7 @@ const repeatedChip = '<span class="chip warn" title="Hay otra pestaña con exact
 function tabRow(tab, isKeeper, isRepeated) {
   const scroll = scrollOf(tab);
   const meta = [
-    tab.chapter != null ? `<strong>Cap. ${tab.chapter}</strong>` : '',
+    tab.chapter != null ? `<strong>Cap. ${tab.chapter}</strong>` : tab.workPage ? '<strong>Ficha de la obra</strong>' : '',
     h(windowLabel(tab)),
     tabGroupChip(tab),
     `visitada ${timeAgo(tab.lastAccessed)}`,
@@ -246,7 +246,7 @@ async function renderCompare() {
         <a class="cmp-url" href="${h(tab.url)}" data-action="go" title="${h(tab.url)}">${h(tab.url)}</a>
         <dl class="cmp-facts">
           <dt>Capítulo</dt>
-          <dd>${tab.chapter ?? '—'} ${chaptersDiffer && tab.chapter === maxChapter ? '<span class="chip ok">Más avanzado</span>' : ''}</dd>
+          <dd>${tab.chapter ?? (tab.workPage ? 'Ficha de la obra' : '—')} ${chaptersDiffer && tab.chapter === maxChapter ? '<span class="chip ok">Más avanzado</span>' : ''}</dd>
           <dt>Última visita</dt>
           <dd>${timeAgo(tab.lastAccessed)} ${g.tabs.length > 1 && tab.lastAccessed === maxVisit ? '<span class="chip ok">Más reciente</span>' : ''}</dd>
           <dt>Leído</dt>

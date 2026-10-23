@@ -115,6 +115,48 @@ test('no mezcla webs distintas por título', () => {
   assert.equal(groups.length, 0);
 });
 
+test('la ficha o sinopsis de la obra entra en el grupo de sus capítulos', () => {
+  const groups = groupDuplicates([
+    tab('https://novels.com/novel/the-legendary-mechanic', 'The Legendary Mechanic - Read Free - Novels'),
+    tab('https://novels.com/novel/the-legendary-mechanic/chapter-1', 'The Legendary Mechanic Chapter 1 - Novels'),
+    tab('https://novels.com/novel/the-legendary-mechanic/chapter-1', 'The Legendary Mechanic Chapter 1 - Novels'),
+    tab('https://novels.com/novel/the-legendary-mechanic/chapter-5', 'The Legendary Mechanic Chapter 5 - Novels'),
+  ]);
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].tabs.length, 4);
+  const page = groups[0].tabs.find((t) => t.chapter == null);
+  assert.ok(page.workPage);
+  // «Cerrar duplicadas» deja solo el capítulo más avanzado.
+  const kept = groups[0].tabs.filter((t) => !duplicatesToClose(groups[0], 'chapter').includes(t.id));
+  assert.deepEqual(kept.map((t) => t.chapter), [5]);
+});
+
+test('reconoce la ficha con otros formatos de URL', () => {
+  const cases = [
+    // ficha.html y capítulos en una carpeta con el mismo nombre
+    ['https://site.com/the-legendary-mechanic.html', 'https://site.com/the-legendary-mechanic/chapter-3.html'],
+    // id numérico + slug, capítulo con id propio (el número va en el título)
+    ['https://rr.com/fiction/123/the-legendary-mechanic', 'https://rr.com/fiction/123/the-legendary-mechanic/chapter/678/la-batalla'],
+    // capítulo como slug al mismo nivel
+    ['https://site.com/novel/the-legendary-mechanic', 'https://site.com/novel/the-legendary-mechanic-chapter-7'],
+  ];
+  for (const [workUrl, chapterUrl] of cases) {
+    const groups = groupDuplicates([tab(workUrl, 'The Legendary Mechanic'), tab(chapterUrl, 'Chapter 7 - The Legendary Mechanic')]);
+    assert.equal(groups.length, 1, workUrl);
+  }
+});
+
+test('una página genérica no se agrupa como ficha', () => {
+  const groups = groupDuplicates([
+    tab('https://novels.com/novel', 'Todas las novelas'),
+    tab('https://novels.com/', 'Inicio'),
+    tab('https://novels.com/novel/the-legendary-mechanic/chapter-5', 'The Legendary Mechanic Chapter 5 - Novels'),
+    tab('https://github.com/user/my-repo', 'my-repo'),
+    tab('https://github.com/user/my-repo/issues/4', 'Bug · Issue #4'),
+  ]);
+  assert.equal(groups.length, 0);
+});
+
 test('pickKeeper según la regla', () => {
   const tabs = [
     { id: 1, chapter: 5, lastAccessed: 300 },

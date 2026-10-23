@@ -35,10 +35,15 @@ export function normalizeUrl(rawUrl) {
   return host + path + (query ? `?${query}` : '');
 }
 
+function titleChapter(title = '') {
+  const match = title.match(TITLE_CHAPTER_RE) || title.match(CJK_CHAPTER_RE);
+  return match ? Number(match[1]) : null;
+}
+
 /** Número de capítulo a partir del título o la URL; `null` si no se reconoce. */
 export function extractChapter(title = '', rawUrl = '') {
-  const fromTitle = title.match(TITLE_CHAPTER_RE) || title.match(CJK_CHAPTER_RE);
-  if (fromTitle) return Number(fromTitle[1]);
+  const fromTitle = titleChapter(title);
+  if (fromTitle != null) return fromTitle;
 
   const work = urlWorkKey(rawUrl);
   return work ? work.chapter : null;
@@ -118,6 +123,50 @@ export function urlWorkKey(rawUrl) {
   };
 }
 
+const PAGE_EXT_RE = /\.(html?|php|aspx?)$/i;
+
+function pathSegments(url) {
+  const segments = url.pathname.split('/').filter(Boolean).map((s) => s.toLowerCase());
+  if (segments.length) segments[segments.length - 1] = segments[segments.length - 1].replace(PAGE_EXT_RE, '');
+  return segments;
+}
+
+function parseHttp(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+const hostKey = (url) => url.hostname.toLowerCase().replace(/^www\./, '');
+
+/**
+ * Clave de una posible ficha de obra (sinopsis, índice): la ruta sin extensión.
+ * `null` si es demasiado genérica (/, /novel) o tiene parámetros (búsquedas, listados).
+ */
+export function workPageKey(rawUrl) {
+  const url = parseHttp(rawUrl);
+  if (!url) return null;
+  if ([...url.searchParams.keys()].some((k) => !TRACKING_PARAMS.test(k))) return null;
+  const segments = pathSegments(url);
+  const specific = segments.length >= 2 || (segments.length === 1 && /[-_]/.test(segments[0]) && segments[0].length >= 6);
+  return specific ? `${hostKey(url)}/${segments.join('/')}` : null;
+}
+
+/** Rutas "padre" de un capítulo donde podría estar la ficha de su obra. */
+function parentPageKeys(rawUrl, work) {
+  const url = parseHttp(rawUrl);
+  if (!url) return [];
+  const segments = pathSegments(url);
+  const keys = [];
+  for (let n = 1; n < segments.length; n++) keys.push(`${hostKey(url)}/${segments.slice(0, n).join('/')}`);
+  // /novela/obra-chapter-7 -> /novela/obra
+  if (work?.strong && !work.key.includes('?')) keys.push(work.key.toLowerCase().replace(PAGE_EXT_RE, ''));
+  return keys;
+}
+
 /** Título sin capítulo, sin números ni signos y sin tildes; sirve de clave. */
 export function titleKey(title = '') {
   const hadChapter = TITLE_CHAPTER_RE.test(title) || CJK_CHAPTER_RE.test(title);
@@ -184,6 +233,10 @@ export function groupDuplicates(tabs) {
       work: urlWorkKey(tab.url),
       title: titleKey(tab.title),
       chapter: extractChapter(tab.title, tab.url),
+      // Capítulo detectado con seguridad: en el título o con "chapter"/"cap" en la URL.
+      // Un número suelto (/issues/4) no basta para enlazar con la ficha.
+      sureChapter: titleChapter(tab.title) != null || Boolean(urlWorkKey(tab.url)?.strong),
+      workPage: false,
     });
   }
 
@@ -226,6 +279,23 @@ export function groupDuplicates(tabs) {
     }
   }
 
+  // Ficha de la obra: página sin capítulo de cuya ruta cuelgan capítulos abiertos.
+  const pagesByKey = new Map();
+  items.forEach((it, i) => {
+    if (it.chapter != null) return;
+    const key = workPageKey(it.tab.url);
+    if (key) pagesByKey.set(key, [...(pagesByKey.get(key) ?? []), i]);
+  });
+  items.forEach((it, i) => {
+    if (!it.sureChapter) return;
+    for (const key of parentPageKeys(it.tab.url, it.work)) {
+      for (const j of pagesByKey.get(key) ?? []) {
+        union(i, j);
+        items[j].workPage = true;
+      }
+    }
+  });
+
   const clusters = new Map();
   items.forEach((it, i) => {
     const root = find(i);
@@ -245,7 +315,7 @@ export function groupDuplicates(tabs) {
       kind: exact ? 'exact' : 'similar',
       label: workLabel(sorted[0].tab.title || sorted[0].norm),
       host: sorted[0].host,
-      tabs: sorted.map((m) => ({ ...m.tab, chapter: m.chapter, norm: m.norm })),
+      tabs: sorted.map((m) => ({ ...m.tab, chapter: m.chapter, norm: m.norm, workPage: m.workPage })),
     });
   }
   return groups.sort((a, b) => b.tabs.length - a.tabs.length || a.label.localeCompare(b.label));

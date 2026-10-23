@@ -4,6 +4,10 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "locales": "node scripts/locales.mjs"
+    "locales": "node scripts/locales.mjs",
+    "package": "node scripts/package.mjs"
+  },
+  "engines": {
+    "node": ">=22.2"
   }
 }

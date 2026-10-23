@@ -222,3 +222,34 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
   .group-head { flex-wrap: wrap; }
   .tab-row { flex-wrap: wrap; }
 }
+
+/* ---------- Móvil (Firefox para Android) y pantallas estrechas ---------- */
+
+.is-mobile .btn { min-height: 40px; }
+.is-mobile .btn.small { min-height: 34px; padding: 4px 12px; }
+.is-mobile input[type="checkbox"] { width: 22px; height: 22px; }
+
+@media (max-width: 700px) {
+  .top { position: static; padding: 12px 16px; }
+  .brand h1 { font-size: 18px; }
+  .bulk, .bulk .btn { width: 100%; }
+  .filters input[type="search"], .filters select { width: 100%; }
+  .filters .spacer { display: none; }
+  .access { margin: 12px 16px 0; flex-direction: column; align-items: stretch; }
+  .groups { padding: 12px 12px 80px; }
+  .group-head { flex-wrap: wrap; }
+  .group-title { flex-basis: calc(100% - 40px); }
+  .tab-row { flex-wrap: wrap; row-gap: 6px; }
+  .tab-row .row-main { flex-basis: calc(100% - 60px); }
+  .tab-row .chip { margin-left: 26px; }
+
+  .overlay { padding: 0; }
+  .cmp-panel { border-radius: 0; min-height: 100%; padding: 12px; }
+  .cmp-head { flex-wrap: wrap; }
+  /* Una columna por pantalla y la siguiente asomando: se compara deslizando. */
+  .cmp-cols { grid-auto-columns: 86%; scroll-snap-type: x mandatory; }
+  .cmp-col { scroll-snap-align: start; }
+
+  .toast { left: 12px; right: 12px; transform: none; bottom: 12px; }
+  @keyframes rise-toast { from { opacity: 0; transform: translateY(8px); } }
+}

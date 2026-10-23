@@ -60,8 +60,8 @@ async function captureTab(tabId) {
   if (!tab?.active || tab.status !== 'complete') return false;
   const norm = normalizeUrl(tab.url);
   if (!norm) return false;
-  const win = await chrome.windows.get(tab.windowId);
-  if (win.state === 'minimized') return false;
+  // Firefox para Android no tiene API de ventanas.
+  if (chrome.windows && (await chrome.windows.get(tab.windowId)).state === 'minimized') return false;
 
   const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 80 });
   // Si mientras tanto cambió la pestaña visible, la captura sería de otra página.
@@ -106,7 +106,7 @@ async function captureTabsNow(tabIds, returnTabId) {
   for (const id of tabIds) {
     try {
       const tab = await chrome.tabs.update(id, { active: true });
-      await chrome.windows.update(tab.windowId, { focused: true });
+      if (chrome.windows) await chrome.windows.update(tab.windowId, { focused: true });
       await waitForComplete(id, 10000);
       await sleep(700);
       results[id] = await enqueueCapture(() => captureTab(id));
@@ -116,7 +116,7 @@ async function captureTabsNow(tabIds, returnTabId) {
   }
   if (returnTabId) {
     const back = await chrome.tabs.update(returnTabId, { active: true }).catch(() => null);
-    if (back) await chrome.windows.update(back.windowId, { focused: true });
+    if (back && chrome.windows) await chrome.windows.update(back.windowId, { focused: true });
   }
   return results;
 }

@@ -1,6 +1,6 @@
 import { groupDuplicates } from '../lib/grouping.js';
 import { localizePage, t, tn } from '../lib/i18n.js';
-import { escapeHtml, focusTab, loadSnapshot, matchesQuery, openManager } from '../lib/tabs.js';
+import { escapeHtml, focusTab, isMobile, loadSnapshot, matchesQuery, openManager } from '../lib/tabs.js';
 
 const MAX_RESULTS = 50;
 const MAX_GROUPS = 8;
@@ -29,6 +29,7 @@ function host(url) {
 }
 
 function windowLabel(tab) {
+  if (!snapshot.multiWindow) return '';
   const label = snapshot.windowLabels.get(tab.windowId) ?? '';
   return tab.windowId === snapshot.currentWindowId ? t('windowThis', label) : label;
 }
@@ -78,7 +79,7 @@ function renderSearch(query) {
         ${favicon(tab)}
         <div class="row-main">
           <div class="row-title">${escapeHtml(tab.title || tab.url)}</div>
-          <div class="row-meta">${escapeHtml(host(tab.url))} · ${escapeHtml(windowLabel(tab))}</div>
+          <div class="row-meta">${escapeHtml(host(tab.url))}${windowLabel(tab) ? ` · ${escapeHtml(windowLabel(tab))}` : ''}</div>
         </div>
         ${twinIds.has(tab.id) ? `<span class="chip warn">${t('duplicateChip')}</span>` : ''}
       </li>`)
@@ -134,6 +135,7 @@ document.getElementById('open-manager').addEventListener('click', async () => {
 });
 
 localizePage();
+if (await isMobile()) document.documentElement.classList.add('is-mobile');
 snapshot = await loadSnapshot();
 groups = groupDuplicates(snapshot.tabs);
 renderCurrent();

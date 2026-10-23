@@ -7,6 +7,7 @@ import {
   escapeHtml as h,
   focusTab,
   hasSiteAccess,
+  isMobile,
   loadSnapshot,
   matchesQuery,
   readLiveScroll,
@@ -92,9 +93,16 @@ function scrollOf(tab) {
   return state.live[tab.id] ?? state.scroll[normalizeUrl(tab.url)] ?? null;
 }
 
+/** Ventana de la pestaña; vacío si solo hay una ventana (o es Firefox para Android). */
 function windowLabel(tab) {
+  if (!state.snap.multiWindow) return '';
   const label = state.snap.windowLabels.get(tab.windowId) ?? t('ariaWindow');
   return tab.windowId === state.snap.currentWindowId ? t('windowThis', label) : label;
+}
+
+function locationOf(tab) {
+  const parts = [h(windowLabel(tab)), tabGroupChip(tab), tab.pinned ? t('pinned') : '', tab.discarded ? t('discarded') : ''].filter(Boolean);
+  return parts.join(' · ');
 }
 
 // En un grupo de "misma obra", pestañas con exactamente la misma URL.
@@ -109,7 +117,7 @@ function tabRow(tab, isKeeper, isRepeated) {
   const scroll = scrollOf(tab);
   const meta = [
     tab.chapter != null ? `<strong>${t('chapterShort', tab.chapter)}</strong>` : tab.workPage ? `<strong>${t('workPage')}</strong>` : '',
-    h(windowLabel(tab)),
+    windowLabel(tab) ? h(windowLabel(tab)) : '',
     tabGroupChip(tab),
     t('visited', timeAgo(tab.lastAccessed)),
     scroll ? t('readPct', scroll.pct) : '',
@@ -171,6 +179,9 @@ function renderFilters() {
   };
   fill($('f-window'), winOptions, 'windowId');
   fill($('f-tabgroup'), groupOptions, 'tabGroup');
+  // Filtros que no aportan nada: una sola ventana, ningún grupo de pestañas (o sin API, en Android).
+  $('f-window').hidden = !snap.multiWindow;
+  $('f-tabgroup').hidden = snap.tabGroups.length === 0;
 }
 
 function render() {
@@ -256,8 +267,7 @@ async function renderCompare() {
                ${scroll.pct === maxScroll && maxScroll > 0 ? `<span class="chip ok">${t('mostRead')}</span>` : ''}
                <small class="muted">${scroll.live ? t('readNow') : t('readSaved', timeAgo(scroll.t))}</small>`
             : `<span class="muted">${t('noScrollData')}</span>`}</dd>
-          <dt>${t('factLocation')}</dt>
-          <dd>${h(windowLabel(tab))} ${tabGroupChip(tab)}${tab.pinned ? ` · ${t('pinned')}` : ''}${tab.discarded ? ` · ${t('discarded')}` : ''}</dd>
+          ${locationOf(tab) ? `<dt>${t('factLocation')}</dt><dd>${locationOf(tab)}</dd>` : ''}
         </dl>
         <div class="cmp-actions">
           <button class="btn small" data-action="go">${t('go')}</button>
@@ -469,7 +479,8 @@ document.addEventListener('keydown', (e) => {
 
 chrome.tabs.onCreated.addListener(scheduleRefresh);
 chrome.tabs.onRemoved.addListener(scheduleRefresh);
-chrome.tabs.onMoved.addListener(scheduleRefresh);
+// onMoved y las APIs windows / tabGroups no existen en Firefox para Android.
+chrome.tabs.onMoved?.addListener(scheduleRefresh);
 chrome.tabs.onAttached.addListener(scheduleRefresh);
 chrome.tabs.onDetached.addListener(scheduleRefresh);
 chrome.tabs.onActivated.addListener(scheduleRefresh);
@@ -477,8 +488,8 @@ chrome.tabs.onUpdated.addListener((_id, info) => {
   if ('url' in info || 'title' in info || 'pinned' in info || 'discarded' in info || 'groupId' in info) scheduleRefresh();
 });
 chrome.tabGroups?.onUpdated.addListener(scheduleRefresh);
-chrome.windows.onCreated.addListener(scheduleRefresh);
-chrome.windows.onRemoved.addListener(scheduleRefresh);
+chrome.windows?.onCreated.addListener(scheduleRefresh);
+chrome.windows?.onRemoved.addListener(scheduleRefresh);
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
   const keys = Object.keys(changes);
@@ -504,6 +515,7 @@ chrome.permissions.onRemoved.addListener(renderAccess);
 // ---------- Inicio ----------
 
 localizePage();
+if (await isMobile()) document.documentElement.classList.add('is-mobile');
 state.settings = await getSettings();
 state.myTabId = (await chrome.tabs.getCurrent())?.id ?? null;
 $('keep-rule').innerHTML = Object.entries(KEEP_RULES)

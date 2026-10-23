@@ -1,29 +1,56 @@
 // Acceso a pestañas, ventanas y grupos de pestañas del navegador (popup y gestor).
+// Firefox para Android no tiene las APIs windows ni tabGroups: todo lo que las
+// usa debe funcionar sin ellas.
 
 import { normalizeUrl } from './grouping.js';
 import { t, uiLanguage } from './i18n.js';
 
 export const MANAGER_PATH = 'src/manager/manager.html';
 
+export const hasWindowsApi = () => Boolean(chrome.windows);
+export const hasTabGroupsApi = () => Boolean(chrome.tabGroups);
+
+/** true en móviles (Firefox para Android). */
+export async function isMobile() {
+  try {
+    return (await chrome.runtime.getPlatformInfo()).os === 'android';
+  } catch {
+    return false;
+  }
+}
+
 /** Pestañas http(s) abiertas, con su ventana y grupo de pestañas. */
 export async function loadSnapshot() {
   const [allTabs, windows, tabGroups, current] = await Promise.all([
     chrome.tabs.query({}),
-    chrome.windows.getAll(),
-    chrome.tabGroups ? chrome.tabGroups.query({}) : [],
-    chrome.windows.getCurrent(),
+    hasWindowsApi() ? chrome.windows.getAll() : [],
+    hasTabGroupsApi() ? chrome.tabGroups.query({}) : [],
+    hasWindowsApi() ? chrome.windows.getCurrent() : null,
   ]);
 
   const windowLabels = new Map(windows.map((w, i) => [w.id, t('windowN', i + 1)]));
   const groupsById = new Map(tabGroups.map((g) => [g.id, g]));
   const tabs = allTabs.filter((t) => normalizeUrl(t.url));
 
-  return { tabs, windows, windowLabels, tabGroups, groupsById, currentWindowId: current.id };
+  return {
+    tabs,
+    windows,
+    windowLabels,
+    // Con una sola ventana (o sin API de ventanas) no se muestra en qué ventana está cada pestaña.
+    multiWindow: windows.length > 1,
+    tabGroups,
+    groupsById,
+    currentWindowId: current?.id ?? allTabs[0]?.windowId ?? null,
+  };
+}
+
+export async function focusWindow(windowId) {
+  if (hasWindowsApi()) await chrome.windows.update(windowId, { focused: true });
 }
 
 export async function focusTab(tab) {
   await chrome.tabs.update(tab.id, { active: true });
-  await chrome.windows.update(tab.windowId, { focused: true });
+  await focusWindow(tab.windowId);
 }
 
 /** Cierra pestañas y devuelve lo necesario para reabrirlas (deshacer). */
@@ -41,7 +68,7 @@ export async function closeTabs(tabs) {
 
 /** Reabre pestañas cerradas en su ventana y grupo originales si siguen existiendo. */
 export async function reopenTabs(restore) {
-  const windowIds = new Set((await chrome.windows.getAll()).map((w) => w.id));
+  const windowIds = new Set(hasWindowsApi() ? (await chrome.windows.getAll()).map((w) => w.id) : []);
   for (const t of [...restore].sort((a, b) => a.index - b.index)) {
     const sameWindow = windowIds.has(t.windowId);
     const created = await chrome.tabs.create({
@@ -71,7 +98,7 @@ export async function openManager(search = '') {
   const [existing] = (await chrome.tabs.query({})).filter((t) => t.url?.startsWith(base));
   if (existing) {
     await chrome.tabs.update(existing.id, { url, active: true });
-    await chrome.windows.update(existing.windowId, { focused: true });
+    await focusWindow(existing.windowId);
   } else {
     await chrome.tabs.create({ url });
   }

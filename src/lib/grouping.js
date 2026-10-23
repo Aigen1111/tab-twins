@@ -321,10 +321,11 @@ export function groupDuplicates(tabs) {
   return groups.sort((a, b) => b.tabs.length - a.tabs.length || a.label.localeCompare(b.label));
 }
 
+/** Reglas para elegir la pestaña que se conserva, con la clave de su texto traducido. */
 export const KEEP_RULES = {
-  chapter: 'Capítulo más avanzado',
-  recent: 'Visitada más recientemente',
-  oldest: 'Abierta primero',
+  chapter: 'ruleChapter',
+  recent: 'ruleRecent',
+  oldest: 'ruleOldest',
 };
 
 /**

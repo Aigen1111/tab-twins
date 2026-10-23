@@ -1,6 +1,7 @@
 // Acceso a pestañas, ventanas y grupos de pestañas del navegador (popup y gestor).
 
 import { normalizeUrl } from './grouping.js';
+import { t, uiLanguage } from './i18n.js';
 
 export const MANAGER_PATH = 'src/manager/manager.html';
 
@@ -13,7 +14,7 @@ export async function loadSnapshot() {
     chrome.windows.getCurrent(),
   ]);
 
-  const windowLabels = new Map(windows.map((w, i) => [w.id, `Ventana ${i + 1}`]));
+  const windowLabels = new Map(windows.map((w, i) => [w.id, t('windowN', i + 1)]));
   const groupsById = new Map(tabGroups.map((g) => [g.id, g]));
   const tabs = allTabs.filter((t) => normalizeUrl(t.url));
 
@@ -94,13 +95,13 @@ export async function readLiveScroll(tab) {
   }
 }
 
-const rtf = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
+const rtf = new Intl.RelativeTimeFormat(uiLanguage(), { numeric: 'auto' });
 
 export function timeAgo(ms) {
-  if (!ms) return 'desconocida';
+  if (!ms) return t('timeUnknown');
   const sec = Math.round((ms - Date.now()) / 1000);
   const abs = Math.abs(sec);
-  if (abs < 60) return 'ahora mismo';
+  if (abs < 60) return t('timeJustNow');
   if (abs < 3600) return rtf.format(Math.round(sec / 60), 'minute');
   if (abs < 86400) return rtf.format(Math.round(sec / 3600), 'hour');
   if (abs < 86400 * 30) return rtf.format(Math.round(sec / 86400), 'day');

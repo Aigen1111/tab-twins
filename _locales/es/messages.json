@@ -1,0 +1,338 @@
+{
+  "extName": {
+    "message": "Tab Twins"
+  },
+  "extDescription": {
+    "message": "Encuentra pestañas duplicadas (por ejemplo, la misma novela en capítulos distintos), compáralas y decide cuáles cerrar."
+  },
+  "windowN": {
+    "message": "Ventana $1"
+  },
+  "windowThis": {
+    "message": "$1 (esta)"
+  },
+  "unnamedGroup": {
+    "message": "Grupo sin nombre"
+  },
+  "timeUnknown": {
+    "message": "desconocida"
+  },
+  "timeJustNow": {
+    "message": "ahora mismo"
+  },
+  "compare": {
+    "message": "Comparar"
+  },
+  "tabsCount_one": {
+    "message": "1 pestaña"
+  },
+  "tabsCount_other": {
+    "message": "$1 pestañas"
+  },
+  "groupsOfDupes_one": {
+    "message": "1 grupo de duplicadas"
+  },
+  "groupsOfDupes_other": {
+    "message": "$1 grupos de duplicadas"
+  },
+  "kindExact": {
+    "message": "Idénticas"
+  },
+  "kindSimilar": {
+    "message": "Misma obra"
+  },
+  "kindExactLower": {
+    "message": "idénticas"
+  },
+  "kindSimilarLower": {
+    "message": "misma obra"
+  },
+  "chapterShort": {
+    "message": "Cap. $1"
+  },
+  "workPage": {
+    "message": "Ficha de la obra"
+  },
+  "searchPlaceholder": {
+    "message": "Buscar en tus pestañas abiertas…"
+  },
+  "reviewDuplicates": {
+    "message": "Revisar duplicados"
+  },
+  "currentTwins_one": {
+    "message": "Esta pestaña tiene <strong>1 gemela</strong> abierta."
+  },
+  "currentTwins_other": {
+    "message": "Esta pestaña tiene <strong>$1 gemelas</strong> abiertas."
+  },
+  "extraTabs_one": {
+    "message": "1 pestaña sobra"
+  },
+  "extraTabs_other": {
+    "message": "$1 pestañas sobran"
+  },
+  "noDuplicatesAmong": {
+    "message": "No hay pestañas duplicadas entre $1 abiertas."
+  },
+  "results_one": {
+    "message": "1 resultado"
+  },
+  "results_other": {
+    "message": "$1 resultados"
+  },
+  "resultsMore": {
+    "message": "Más de $1 resultados"
+  },
+  "duplicateChip": {
+    "message": "Duplicada"
+  },
+  "managerTitle": {
+    "message": "Tab Twins · Duplicadas"
+  },
+  "closeSelected": {
+    "message": "Cerrar seleccionadas ($1)"
+  },
+  "closeAllDupes": {
+    "message": "Cerrar todas las duplicadas ($1)"
+  },
+  "filterPlaceholder": {
+    "message": "Filtrar por título o web…"
+  },
+  "ariaWindow": {
+    "message": "Ventana"
+  },
+  "ariaTabGroup": {
+    "message": "Grupo de pestañas"
+  },
+  "ariaKind": {
+    "message": "Tipo"
+  },
+  "kindAll": {
+    "message": "Idénticas y misma obra"
+  },
+  "kindExactOnly": {
+    "message": "Solo idénticas"
+  },
+  "kindSimilarOnly": {
+    "message": "Solo misma obra"
+  },
+  "keepRuleLabel": {
+    "message": "Al cerrar duplicadas, conservar"
+  },
+  "ruleChapter": {
+    "message": "capítulo más avanzado"
+  },
+  "ruleRecent": {
+    "message": "visitada más recientemente"
+  },
+  "ruleOldest": {
+    "message": "abierta primero"
+  },
+  "autoCapture": {
+    "message": "Capturas automáticas"
+  },
+  "allWindows": {
+    "message": "Todas las ventanas"
+  },
+  "allTabGroups": {
+    "message": "Todos los grupos de pestañas"
+  },
+  "noTabGroup": {
+    "message": "Sin grupo de pestañas"
+  },
+  "statsExtra": {
+    "message": "$1 de sobra"
+  },
+  "openTabs_one": {
+    "message": "1 pestaña abierta"
+  },
+  "openTabs_other": {
+    "message": "$1 pestañas abiertas"
+  },
+  "statsNone": {
+    "message": "Sin duplicadas"
+  },
+  "accessText": {
+    "message": "Sin acceso a las webs no se pueden hacer capturas ni saber cuánto llevas leído."
+  },
+  "grantAccess": {
+    "message": "Dar acceso"
+  },
+  "accessGranted": {
+    "message": "Acceso concedido. Las capturas y el scroll empezarán a guardarse."
+  },
+  "repeated": {
+    "message": "Repetida"
+  },
+  "repeatedTitle": {
+    "message": "Hay otra pestaña con exactamente la misma URL"
+  },
+  "visited": {
+    "message": "visitada $1"
+  },
+  "readPct": {
+    "message": "$1 % leído"
+  },
+  "pct": {
+    "message": "$1 %"
+  },
+  "pinned": {
+    "message": "fijada"
+  },
+  "discarded": {
+    "message": "dormida"
+  },
+  "select": {
+    "message": "Seleccionar"
+  },
+  "selectGroup": {
+    "message": "Seleccionar todo el grupo"
+  },
+  "kept": {
+    "message": "Se conserva"
+  },
+  "keptTitle": {
+    "message": "La que se queda al usar «Cerrar duplicadas»"
+  },
+  "go": {
+    "message": "Ir"
+  },
+  "close": {
+    "message": "Cerrar"
+  },
+  "closeGroupDupes": {
+    "message": "Cerrar duplicadas ($1)"
+  },
+  "emptyFilteredTitle": {
+    "message": "Nada con estos filtros."
+  },
+  "emptyFilteredHint": {
+    "message": "Prueba a quitar algún filtro."
+  },
+  "emptyTitle": {
+    "message": "No hay pestañas duplicadas."
+  },
+  "emptyHint": {
+    "message": "Cuando abras dos veces la misma página o capítulos de la misma obra, aparecerán aquí."
+  },
+  "noDupesLeft": {
+    "message": "Ya no quedan duplicadas en ese grupo."
+  },
+  "shotAlt": {
+    "message": "Captura de la página"
+  },
+  "shotAge": {
+    "message": "captura $1"
+  },
+  "noShot": {
+    "message": "Sin captura"
+  },
+  "capture": {
+    "message": "Capturar"
+  },
+  "factChapter": {
+    "message": "Capítulo"
+  },
+  "mostAdvanced": {
+    "message": "Más avanzado"
+  },
+  "factLastVisit": {
+    "message": "Última visita"
+  },
+  "mostRecent": {
+    "message": "Más reciente"
+  },
+  "factRead": {
+    "message": "Leído"
+  },
+  "mostRead": {
+    "message": "Más leído"
+  },
+  "readNow": {
+    "message": "ahora"
+  },
+  "readSaved": {
+    "message": "guardado $1"
+  },
+  "noScrollData": {
+    "message": "Sin datos (recarga la pestaña o desplázate en ella)"
+  },
+  "factLocation": {
+    "message": "Ubicación"
+  },
+  "closeThis": {
+    "message": "Cerrar esta"
+  },
+  "keepOnly": {
+    "message": "Quedarme solo con esta"
+  },
+  "compareAria": {
+    "message": "Comparar pestañas"
+  },
+  "refreshShots": {
+    "message": "Actualizar capturas"
+  },
+  "refreshShotsTitle": {
+    "message": "Activa cada pestaña un momento para hacerle una captura"
+  },
+  "closeCompareAria": {
+    "message": "Cerrar comparación"
+  },
+  "capturing": {
+    "message": "Capturando… las pestañas se activarán un momento."
+  },
+  "capturesUpdated": {
+    "message": "Capturas actualizadas."
+  },
+  "confirmClose_one": {
+    "message": "¿Cerrar 1 pestaña?"
+  },
+  "confirmClose_other": {
+    "message": "¿Cerrar $1 pestañas?"
+  },
+  "confirmCloseAll": {
+    "message": "¿Cerrar $1 de $2?"
+  },
+  "dupes_one": {
+    "message": "1 duplicada"
+  },
+  "dupes_other": {
+    "message": "$1 duplicadas"
+  },
+  "groups_one": {
+    "message": "1 grupo"
+  },
+  "groups_other": {
+    "message": "$1 grupos"
+  },
+  "andMore": {
+    "message": "y $1 más…"
+  },
+  "undoHint": {
+    "message": "Podrás deshacerlo justo después."
+  },
+  "cancel": {
+    "message": "Cancelar"
+  },
+  "confirmCloseN": {
+    "message": "Cerrar $1"
+  },
+  "closedTabs_one": {
+    "message": "Cerrada 1 pestaña."
+  },
+  "closedTabs_other": {
+    "message": "Cerradas $1 pestañas."
+  },
+  "undo": {
+    "message": "Deshacer"
+  },
+  "keepNoteOne": {
+    "message": "Se conserva: <strong>$1</strong>. Las fijadas nunca se cierran."
+  },
+  "keepNoteMany": {
+    "message": "Se conserva una pestaña por grupo ($1). Las fijadas nunca se cierran."
+  },
+  "manualNote": {
+    "message": "Has elegido estas pestañas a mano."
+  }
+}

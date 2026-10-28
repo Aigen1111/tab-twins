@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tab Twins · Duplicadas</title>
+  <title data-i18n="managerTitle">Tab Twins</title>
   <link rel="stylesheet" href="../ui/base.css">
   <link rel="stylesheet" href="manager.css">
 </head>
@@ -15,30 +15,30 @@
         <p id="stats" class="muted"></p>
       </div>
       <div class="bulk">
-        <button id="close-selected" class="btn danger" disabled>Cerrar seleccionadas (0)</button>
-        <button id="close-all-dupes" class="btn primary" disabled>Cerrar todas las duplicadas (0)</button>
+        <button id="close-selected" class="btn danger" disabled></button>
+        <button id="close-all-dupes" class="btn primary" disabled></button>
       </div>
     </div>
     <div class="top-row filters">
-      <input id="q" type="search" placeholder="Filtrar por título o web…" autocomplete="off">
-      <select id="f-window" aria-label="Ventana"></select>
-      <select id="f-tabgroup" aria-label="Grupo de pestañas"></select>
-      <select id="f-kind" aria-label="Tipo">
-        <option value="all">Idénticas y misma obra</option>
-        <option value="exact">Solo idénticas</option>
-        <option value="similar">Solo misma obra</option>
+      <input id="q" type="search" data-i18n-placeholder="filterPlaceholder" autocomplete="off">
+      <select id="f-window" data-i18n-aria="ariaWindow"></select>
+      <select id="f-tabgroup" data-i18n-aria="ariaTabGroup"></select>
+      <select id="f-kind" data-i18n-aria="ariaKind">
+        <option value="all" data-i18n="kindAll"></option>
+        <option value="exact" data-i18n="kindExactOnly"></option>
+        <option value="similar" data-i18n="kindSimilarOnly"></option>
       </select>
       <span class="spacer"></span>
-      <label class="field">Al cerrar duplicadas, conservar
+      <label class="field"><span data-i18n="keepRuleLabel"></span>
         <select id="keep-rule"></select>
       </label>
-      <label class="field toggle"><input id="auto-capture" type="checkbox"> Capturas automáticas</label>
+      <label class="field toggle"><input id="auto-capture" type="checkbox"> <span data-i18n="autoCapture"></span></label>
     </div>
   </header>
 
   <div id="access" class="access" hidden>
-    <span>Sin acceso a las webs no se pueden hacer capturas ni saber cuánto llevas leído.</span>
-    <button id="grant-access" class="btn small primary">Dar acceso</button>
+    <span data-i18n="accessText"></span>
+    <button id="grant-access" class="btn small primary" data-i18n="grantAccess"></button>
   </div>
 
   <main id="groups" class="groups"></main>

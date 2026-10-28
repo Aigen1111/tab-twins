@@ -1,5 +1,6 @@
 import { groupDuplicates } from '../lib/grouping.js';
-import { escapeHtml, focusTab, loadSnapshot, matchesQuery, openManager } from '../lib/tabs.js';
+import { localizePage, t, tn } from '../lib/i18n.js';
+import { escapeHtml, focusTab, isMobile, loadSnapshot, matchesQuery, openManager } from '../lib/tabs.js';
 
 const MAX_RESULTS = 50;
 const MAX_GROUPS = 8;
@@ -27,6 +28,12 @@ function host(url) {
   }
 }
 
+function windowLabel(tab) {
+  if (!snapshot.multiWindow) return '';
+  const label = snapshot.windowLabels.get(tab.windowId) ?? '';
+  return tab.windowId === snapshot.currentWindowId ? t('windowThis', label) : label;
+}
+
 function renderCurrent() {
   const [active] = snapshot.tabs.filter((t) => t.active && t.windowId === snapshot.currentWindowId);
   const group = active && groups.find((g) => g.tabs.some((t) => t.id === active.id));
@@ -35,16 +42,16 @@ function renderCurrent() {
   const others = group.tabs.length - 1;
   $current.innerHTML = `
     <div class="notice">
-      <span>Esta pestaña tiene <strong>${others} ${others === 1 ? 'gemela' : 'gemelas'}</strong> abierta${others === 1 ? '' : 's'}.</span>
-      <button class="btn small" data-compare="${active.id}">Comparar</button>
+      <span>${tn('currentTwins', others)}</span>
+      <button class="btn small" data-compare="${active.id}">${t('compare')}</button>
     </div>`;
 }
 
 function renderGroups() {
   const extra = groups.reduce((n, g) => n + g.tabs.length - 1, 0);
   $summary.innerHTML = groups.length
-    ? `<p class="muted">${groups.length} ${groups.length === 1 ? 'grupo' : 'grupos'} de duplicadas · ${extra} ${extra === 1 ? 'pestaña sobra' : 'pestañas sobran'}</p>`
-    : `<p class="muted">No hay pestañas duplicadas entre ${snapshot.tabs.length} abiertas.</p>`;
+    ? `<p class="muted">${tn('groupsOfDupes', groups.length)} · ${tn('extraTabs', extra)}</p>`
+    : `<p class="muted">${t('noDuplicatesAmong', snapshot.tabs.length)}</p>`;
 
   items = groups.slice(0, MAX_GROUPS).map((g) => ({ type: 'group', group: g }));
   $results.innerHTML = items
@@ -53,16 +60,16 @@ function renderGroups() {
         ${favicon(g.tabs[0])}
         <div class="row-main">
           <div class="row-title">${escapeHtml(g.label)}</div>
-          <div class="row-meta">${escapeHtml(g.host)} · ${g.tabs.length} pestañas · ${g.kind === 'exact' ? 'idénticas' : 'misma obra'}</div>
+          <div class="row-meta">${escapeHtml(g.host)} · ${tn('tabsCount', g.tabs.length)} · ${t(g.kind === 'exact' ? 'kindExactLower' : 'kindSimilarLower')}</div>
         </div>
-        <span class="chip">Comparar</span>
+        <span class="chip">${t('compare')}</span>
       </li>`)
     .join('');
 }
 
 function renderSearch(query) {
   const found = snapshot.tabs.filter((t) => matchesQuery(t, query)).slice(0, MAX_RESULTS);
-  $summary.innerHTML = `<p class="muted">${found.length === MAX_RESULTS ? `Más de ${MAX_RESULTS}` : found.length} ${found.length === 1 ? 'resultado' : 'resultados'}</p>`;
+  $summary.innerHTML = `<p class="muted">${found.length === MAX_RESULTS ? t('resultsMore', MAX_RESULTS) : tn('results', found.length)}</p>`;
   const twinIds = new Set(groups.flatMap((g) => g.tabs.map((t) => t.id)));
 
   items = found.map((tab) => ({ type: 'tab', tab }));
@@ -72,9 +79,9 @@ function renderSearch(query) {
         ${favicon(tab)}
         <div class="row-main">
           <div class="row-title">${escapeHtml(tab.title || tab.url)}</div>
-          <div class="row-meta">${escapeHtml(host(tab.url))} · ${escapeHtml(snapshot.windowLabels.get(tab.windowId))}${tab.windowId === snapshot.currentWindowId ? ' (esta)' : ''}</div>
+          <div class="row-meta">${escapeHtml(host(tab.url))}${windowLabel(tab) ? ` · ${escapeHtml(windowLabel(tab))}` : ''}</div>
         </div>
-        ${twinIds.has(tab.id) ? '<span class="chip warn">Duplicada</span>' : ''}
+        ${twinIds.has(tab.id) ? `<span class="chip warn">${t('duplicateChip')}</span>` : ''}
       </li>`)
     .join('');
 }
@@ -127,6 +134,8 @@ document.getElementById('open-manager').addEventListener('click', async () => {
   window.close();
 });
 
+localizePage();
+if (await isMobile()) document.documentElement.classList.add('is-mobile');
 snapshot = await loadSnapshot();
 groups = groupDuplicates(snapshot.tabs);
 renderCurrent();

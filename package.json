@@ -3,6 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "locales": "node scripts/locales.mjs",
+    "package": "node scripts/package.mjs"
+  },
+  "engines": {
+    "node": ">=22.2"
   }
 }

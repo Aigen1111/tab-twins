@@ -1,0 +1,338 @@
+{
+  "extName": {
+    "message": "Tab Twins"
+  },
+  "extDescription": {
+    "message": "Find duplicate tabs (like the same web novel open at different chapters), compare them and decide which to close."
+  },
+  "windowN": {
+    "message": "Window $1"
+  },
+  "windowThis": {
+    "message": "$1 (this one)"
+  },
+  "unnamedGroup": {
+    "message": "Unnamed group"
+  },
+  "timeUnknown": {
+    "message": "unknown"
+  },
+  "timeJustNow": {
+    "message": "just now"
+  },
+  "compare": {
+    "message": "Compare"
+  },
+  "tabsCount_one": {
+    "message": "1 tab"
+  },
+  "tabsCount_other": {
+    "message": "$1 tabs"
+  },
+  "groupsOfDupes_one": {
+    "message": "1 duplicate group"
+  },
+  "groupsOfDupes_other": {
+    "message": "$1 duplicate groups"
+  },
+  "kindExact": {
+    "message": "Identical"
+  },
+  "kindSimilar": {
+    "message": "Same work"
+  },
+  "kindExactLower": {
+    "message": "identical"
+  },
+  "kindSimilarLower": {
+    "message": "same work"
+  },
+  "chapterShort": {
+    "message": "Ch. $1"
+  },
+  "workPage": {
+    "message": "Series page"
+  },
+  "searchPlaceholder": {
+    "message": "Search your open tabs…"
+  },
+  "reviewDuplicates": {
+    "message": "Review duplicates"
+  },
+  "currentTwins_one": {
+    "message": "This tab has <strong>1 twin</strong> open."
+  },
+  "currentTwins_other": {
+    "message": "This tab has <strong>$1 twins</strong> open."
+  },
+  "extraTabs_one": {
+    "message": "1 tab too many"
+  },
+  "extraTabs_other": {
+    "message": "$1 tabs too many"
+  },
+  "noDuplicatesAmong": {
+    "message": "No duplicate tabs among $1 open."
+  },
+  "results_one": {
+    "message": "1 result"
+  },
+  "results_other": {
+    "message": "$1 results"
+  },
+  "resultsMore": {
+    "message": "More than $1 results"
+  },
+  "duplicateChip": {
+    "message": "Duplicate"
+  },
+  "managerTitle": {
+    "message": "Tab Twins · Duplicates"
+  },
+  "closeSelected": {
+    "message": "Close selected ($1)"
+  },
+  "closeAllDupes": {
+    "message": "Close all duplicates ($1)"
+  },
+  "filterPlaceholder": {
+    "message": "Filter by title or site…"
+  },
+  "ariaWindow": {
+    "message": "Window"
+  },
+  "ariaTabGroup": {
+    "message": "Tab group"
+  },
+  "ariaKind": {
+    "message": "Type"
+  },
+  "kindAll": {
+    "message": "Identical and same work"
+  },
+  "kindExactOnly": {
+    "message": "Identical only"
+  },
+  "kindSimilarOnly": {
+    "message": "Same work only"
+  },
+  "keepRuleLabel": {
+    "message": "When closing duplicates, keep"
+  },
+  "ruleChapter": {
+    "message": "furthest chapter"
+  },
+  "ruleRecent": {
+    "message": "most recently visited"
+  },
+  "ruleOldest": {
+    "message": "opened first"
+  },
+  "autoCapture": {
+    "message": "Automatic screenshots"
+  },
+  "allWindows": {
+    "message": "All windows"
+  },
+  "allTabGroups": {
+    "message": "All tab groups"
+  },
+  "noTabGroup": {
+    "message": "No tab group"
+  },
+  "statsExtra": {
+    "message": "$1 extra"
+  },
+  "openTabs_one": {
+    "message": "1 open tab"
+  },
+  "openTabs_other": {
+    "message": "$1 open tabs"
+  },
+  "statsNone": {
+    "message": "No duplicates"
+  },
+  "accessText": {
+    "message": "Without access to websites, screenshots and reading progress can’t be saved."
+  },
+  "grantAccess": {
+    "message": "Grant access"
+  },
+  "accessGranted": {
+    "message": "Access granted. Screenshots and reading progress will now be saved."
+  },
+  "repeated": {
+    "message": "Repeated"
+  },
+  "repeatedTitle": {
+    "message": "Another tab has exactly the same URL"
+  },
+  "visited": {
+    "message": "visited $1"
+  },
+  "readPct": {
+    "message": "$1% read"
+  },
+  "pct": {
+    "message": "$1%"
+  },
+  "pinned": {
+    "message": "pinned"
+  },
+  "discarded": {
+    "message": "sleeping"
+  },
+  "select": {
+    "message": "Select"
+  },
+  "selectGroup": {
+    "message": "Select whole group"
+  },
+  "kept": {
+    "message": "Kept"
+  },
+  "keptTitle": {
+    "message": "The one kept by “Close duplicates”"
+  },
+  "go": {
+    "message": "Go"
+  },
+  "close": {
+    "message": "Close"
+  },
+  "closeGroupDupes": {
+    "message": "Close duplicates ($1)"
+  },
+  "emptyFilteredTitle": {
+    "message": "Nothing matches these filters."
+  },
+  "emptyFilteredHint": {
+    "message": "Try removing a filter."
+  },
+  "emptyTitle": {
+    "message": "No duplicate tabs."
+  },
+  "emptyHint": {
+    "message": "When you open the same page twice, or chapters of the same work, they’ll show up here."
+  },
+  "noDupesLeft": {
+    "message": "No duplicates left in that group."
+  },
+  "shotAlt": {
+    "message": "Page screenshot"
+  },
+  "shotAge": {
+    "message": "captured $1"
+  },
+  "noShot": {
+    "message": "No screenshot"
+  },
+  "capture": {
+    "message": "Capture"
+  },
+  "factChapter": {
+    "message": "Chapter"
+  },
+  "mostAdvanced": {
+    "message": "Furthest"
+  },
+  "factLastVisit": {
+    "message": "Last visit"
+  },
+  "mostRecent": {
+    "message": "Most recent"
+  },
+  "factRead": {
+    "message": "Read"
+  },
+  "mostRead": {
+    "message": "Most read"
+  },
+  "readNow": {
+    "message": "now"
+  },
+  "readSaved": {
+    "message": "saved $1"
+  },
+  "noScrollData": {
+    "message": "No data (reload the tab or scroll in it)"
+  },
+  "factLocation": {
+    "message": "Location"
+  },
+  "closeThis": {
+    "message": "Close this one"
+  },
+  "keepOnly": {
+    "message": "Keep only this one"
+  },
+  "compareAria": {
+    "message": "Compare tabs"
+  },
+  "refreshShots": {
+    "message": "Refresh screenshots"
+  },
+  "refreshShotsTitle": {
+    "message": "Briefly switches to each tab to capture it"
+  },
+  "closeCompareAria": {
+    "message": "Close comparison"
+  },
+  "capturing": {
+    "message": "Capturing… each tab will be shown for a moment."
+  },
+  "capturesUpdated": {
+    "message": "Screenshots updated."
+  },
+  "confirmClose_one": {
+    "message": "Close 1 tab?"
+  },
+  "confirmClose_other": {
+    "message": "Close $1 tabs?"
+  },
+  "confirmCloseAll": {
+    "message": "Close $1 from $2?"
+  },
+  "dupes_one": {
+    "message": "1 duplicate"
+  },
+  "dupes_other": {
+    "message": "$1 duplicates"
+  },
+  "groups_one": {
+    "message": "1 group"
+  },
+  "groups_other": {
+    "message": "$1 groups"
+  },
+  "andMore": {
+    "message": "and $1 more…"
+  },
+  "undoHint": {
+    "message": "You can undo this right after."
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "confirmCloseN": {
+    "message": "Close $1"
+  },
+  "closedTabs_one": {
+    "message": "Closed 1 tab."
+  },
+  "closedTabs_other": {
+    "message": "Closed $1 tabs."
+  },
+  "undo": {
+    "message": "Undo"
+  },
+  "keepNoteOne": {
+    "message": "Keeping: <strong>$1</strong>. Pinned tabs are never closed."
+  },
+  "keepNoteMany": {
+    "message": "One tab is kept per group ($1). Pinned tabs are never closed."
+  },
+  "manualNote": {
+    "message": "You picked these tabs yourself."
+  }
+}

@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="es">
+<html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tab Twins</title>
   <link rel="stylesheet" href="../ui/base.css">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <header class="popup-head">
-    <input id="search" type="search" placeholder="Buscar en tus pestañas abiertas…" autocomplete="off" autofocus>
+    <input id="search" type="search" data-i18n-placeholder="searchPlaceholder" autocomplete="off" autofocus>
   </header>
 
   <section id="current" hidden></section>
@@ -16,7 +17,7 @@
   <ul id="results" class="list" role="listbox"></ul>
 
   <footer class="popup-foot">
-    <button id="open-manager" class="btn primary">Revisar duplicados</button>
+    <button id="open-manager" class="btn primary" data-i18n="reviewDuplicates"></button>
   </footer>
 
   <script type="module" src="popup.js"></script>

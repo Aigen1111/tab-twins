@@ -1,14 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Tab Twins",
-  "version": "0.1.0",
-  "description": "Encuentra pestañas duplicadas (por ejemplo, la misma novela en capítulos distintos), compáralas y decide cuáles cerrar.",
+  "name": "__MSG_extName__",
+  "version": "0.2.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "minimum_chrome_version": "121",
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-twins@local",
       "strict_min_version": "140.0",
       "data_collection_permissions": { "required": ["none"] }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
     }
   },
   "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage", "scripting"],
@@ -20,7 +24,7 @@
   },
   "action": {
     "default_popup": "src/popup/popup.html",
-    "default_title": "Tab Twins",
+    "default_title": "__MSG_extName__",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

@@ -39,3 +39,8 @@ body {
 
 .popup-foot { padding: 10px 12px; border-top: 1px solid var(--border); }
 .popup-foot .btn { width: 100%; }
+
+/* Firefox para Android abre el popup a pantalla completa. */
+.is-mobile body { width: auto; max-height: none; min-height: 100vh; }
+.is-mobile .row { padding: 10px 8px; }
+.is-mobile .btn { min-height: 40px; }

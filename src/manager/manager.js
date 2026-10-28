@@ -1,4 +1,5 @@
 import { KEEP_RULES, duplicatesToClose, groupDuplicates, normalizeUrl, pickKeeper } from '../lib/grouping.js';
+import { localizePage, t, tn } from '../lib/i18n.js';
 import { getSettings, saveSettings, scrollKey, shotKey } from '../lib/store.js';
 import {
   GROUP_COLORS,
@@ -6,6 +7,7 @@ import {
   escapeHtml as h,
   focusTab,
   hasSiteAccess,
+  isMobile,
   loadSnapshot,
   matchesQuery,
   readLiveScroll,
@@ -84,16 +86,23 @@ function favicon(tab) {
 function tabGroupChip(tab) {
   const g = state.snap.groupsById.get(tab.groupId);
   if (!g) return '';
-  return `<span class="tg"><span class="tg-dot" style="background:${GROUP_COLORS[g.color] ?? GROUP_COLORS.grey}"></span>${h(g.title || 'Grupo sin nombre')}</span>`;
+  return `<span class="tg"><span class="tg-dot" style="background:${GROUP_COLORS[g.color] ?? GROUP_COLORS.grey}"></span>${h(g.title || t('unnamedGroup'))}</span>`;
 }
 
 function scrollOf(tab) {
   return state.live[tab.id] ?? state.scroll[normalizeUrl(tab.url)] ?? null;
 }
 
+/** Ventana de la pestaña; vacío si solo hay una ventana (o es Firefox para Android). */
 function windowLabel(tab) {
-  const label = state.snap.windowLabels.get(tab.windowId) ?? 'Ventana';
-  return tab.windowId === state.snap.currentWindowId ? `${label} (esta)` : label;
+  if (!state.snap.multiWindow) return '';
+  const label = state.snap.windowLabels.get(tab.windowId) ?? t('ariaWindow');
+  return tab.windowId === state.snap.currentWindowId ? t('windowThis', label) : label;
+}
+
+function locationOf(tab) {
+  const parts = [h(windowLabel(tab)), tabGroupChip(tab), tab.pinned ? t('pinned') : '', tab.discarded ? t('discarded') : ''].filter(Boolean);
+  return parts.join(' · ');
 }
 
 // En un grupo de "misma obra", pestañas con exactamente la misma URL.
@@ -102,32 +111,32 @@ function repeatedNorms(group) {
   for (const t of group.tabs) seen.set(t.norm, (seen.get(t.norm) ?? 0) + 1);
   return new Set(group.kind === 'similar' ? [...seen].filter(([, n]) => n > 1).map(([norm]) => norm) : []);
 }
-const repeatedChip = '<span class="chip warn" title="Hay otra pestaña con exactamente la misma URL">Repetida</span>';
+const repeatedChip = () => `<span class="chip warn" title="${h(t('repeatedTitle'))}">${t('repeated')}</span>`;
 
 function tabRow(tab, isKeeper, isRepeated) {
   const scroll = scrollOf(tab);
   const meta = [
-    tab.chapter != null ? `<strong>Cap. ${tab.chapter}</strong>` : '',
-    h(windowLabel(tab)),
+    tab.chapter != null ? `<strong>${t('chapterShort', tab.chapter)}</strong>` : tab.workPage ? `<strong>${t('workPage')}</strong>` : '',
+    windowLabel(tab) ? h(windowLabel(tab)) : '',
     tabGroupChip(tab),
-    `visitada ${timeAgo(tab.lastAccessed)}`,
-    scroll ? `${scroll.pct} % leído` : '',
-    tab.pinned ? 'fijada' : '',
-    tab.discarded ? 'dormida' : '',
+    t('visited', timeAgo(tab.lastAccessed)),
+    scroll ? t('readPct', scroll.pct) : '',
+    tab.pinned ? t('pinned') : '',
+    tab.discarded ? t('discarded') : '',
   ].filter(Boolean);
 
   return `
     <li class="tab-row ${state.selected.has(tab.id) ? 'is-selected' : ''}" data-tab="${tab.id}">
-      <input type="checkbox" data-action="select-tab" aria-label="Seleccionar" ${state.selected.has(tab.id) ? 'checked' : ''}>
+      <input type="checkbox" data-action="select-tab" aria-label="${h(t('select'))}" ${state.selected.has(tab.id) ? 'checked' : ''}>
       ${favicon(tab)}
       <div class="row-main">
         <a href="${h(tab.url)}" class="row-title" data-action="go" title="${h(tab.url)}">${h(tab.title || tab.url)}</a>
         <div class="row-meta">${meta.join('<span class="sep">·</span>')}</div>
       </div>
-      ${isRepeated ? repeatedChip : ''}
-      ${isKeeper ? '<span class="chip ok" title="La que se queda al usar «Cerrar duplicadas»">Se conserva</span>' : ''}
-      <button class="btn small" data-action="go">Ir</button>
-      <button class="btn small danger" data-action="close-tab">Cerrar</button>
+      ${isRepeated ? repeatedChip() : ''}
+      ${isKeeper ? `<span class="chip ok" title="${h(t('keptTitle'))}">${t('kept')}</span>` : ''}
+      <button class="btn small" data-action="go">${t('go')}</button>
+      <button class="btn small danger" data-action="close-tab">${t('close')}</button>
     </li>`;
 }
 
@@ -139,14 +148,14 @@ function groupCard(g) {
   return `
     <article class="group" data-group="${g.id}">
       <header class="group-head">
-        <input type="checkbox" data-action="select-group" aria-label="Seleccionar todo el grupo" ${allSelected ? 'checked' : ''}>
+        <input type="checkbox" data-action="select-group" aria-label="${h(t('selectGroup'))}" ${allSelected ? 'checked' : ''}>
         <div class="group-title">
           <h2>${h(g.label)}</h2>
-          <div class="muted">${h(g.host)} · ${g.tabs.length} pestañas</div>
+          <div class="muted">${h(g.host)} · ${tn('tabsCount', g.tabs.length)}</div>
         </div>
-        <span class="chip ${g.kind === 'exact' ? 'warn' : ''}">${g.kind === 'exact' ? 'Idénticas' : 'Misma obra'}</span>
-        <button class="btn small" data-action="compare">Comparar</button>
-        <button class="btn small danger" data-action="close-group-dupes" ${closable ? '' : 'disabled'}>Cerrar duplicadas (${closable})</button>
+        <span class="chip ${g.kind === 'exact' ? 'warn' : ''}">${t(g.kind === 'exact' ? 'kindExact' : 'kindSimilar')}</span>
+        <button class="btn small" data-action="compare">${t('compare')}</button>
+        <button class="btn small danger" data-action="close-group-dupes" ${closable ? '' : 'disabled'}>${t('closeGroupDupes', closable)}</button>
       </header>
       <ul class="list">${g.tabs.map((t) => tabRow(t, t.id === keeper.id, repeated.has(t.norm))).join('')}</ul>
     </article>`;
@@ -157,11 +166,11 @@ function renderFilters() {
   const counts = new Map();
   for (const t of snap.tabs) counts.set(t.windowId, (counts.get(t.windowId) ?? 0) + 1);
 
-  const winOptions = [['all', 'Todas las ventanas']].concat(
-    snap.windows.map((w) => [String(w.id), `${windowLabel({ windowId: w.id })} · ${counts.get(w.id) ?? 0} pestañas`]),
+  const winOptions = [['all', t('allWindows')]].concat(
+    snap.windows.map((w) => [String(w.id), `${windowLabel({ windowId: w.id })} · ${tn('tabsCount', counts.get(w.id) ?? 0)}`]),
   );
-  const groupOptions = [['all', 'Todos los grupos de pestañas'], ['none', 'Sin grupo de pestañas']].concat(
-    snap.tabGroups.map((g) => [String(g.id), `${g.title || 'Grupo sin nombre'} · ${snap.windowLabels.get(g.windowId) ?? ''}`]),
+  const groupOptions = [['all', t('allTabGroups')], ['none', t('noTabGroup')]].concat(
+    snap.tabGroups.map((g) => [String(g.id), `${g.title || t('unnamedGroup')} · ${snap.windowLabels.get(g.windowId) ?? ''}`]),
   );
 
   const fill = (select, options, key) => {
@@ -170,6 +179,9 @@ function renderFilters() {
   };
   fill($('f-window'), winOptions, 'windowId');
   fill($('f-tabgroup'), groupOptions, 'tabGroup');
+  // Filtros que no aportan nada: una sola ventana, ningún grupo de pestañas (o sin API, en Android).
+  $('f-window').hidden = !snap.multiWindow;
+  $('f-tabgroup').hidden = snap.tabGroups.length === 0;
 }
 
 function render() {
@@ -179,12 +191,12 @@ function render() {
   const extra = state.groups.reduce((n, g) => n + g.tabs.length - 1, 0);
 
   $('stats').textContent = state.groups.length
-    ? `${state.groups.length} ${state.groups.length === 1 ? 'grupo' : 'grupos'} de duplicadas · ${extra} de sobra · ${total} pestañas abiertas`
-    : `Sin duplicadas · ${total} pestañas abiertas`;
+    ? `${tn('groupsOfDupes', state.groups.length)} · ${t('statsExtra', extra)} · ${tn('openTabs', total)}`
+    : `${t('statsNone')} · ${tn('openTabs', total)}`;
 
-  $('close-selected').textContent = `Cerrar seleccionadas (${state.selected.size})`;
+  $('close-selected').textContent = t('closeSelected', state.selected.size);
   $('close-selected').disabled = state.selected.size === 0;
-  $('close-all-dupes').textContent = `Cerrar todas las duplicadas (${dupeIds.length})`;
+  $('close-all-dupes').textContent = t('closeAllDupes', dupeIds.length);
   $('close-all-dupes').disabled = dupeIds.length === 0;
 
   if (state.visible.length) {
@@ -193,8 +205,8 @@ function render() {
     const filtered = state.filters.q || state.filters.kind !== 'all' || state.filters.windowId !== 'all' || state.filters.tabGroup !== 'all';
     $groups.innerHTML = `
       <div class="empty">
-        <p><strong>${filtered ? 'Nada con estos filtros.' : 'No hay pestañas duplicadas.'}</strong></p>
-        <p class="muted">${filtered ? 'Prueba a quitar algún filtro.' : 'Cuando abras dos veces la misma página o capítulos de la misma obra, aparecerán aquí.'}</p>
+        <p><strong>${t(filtered ? 'emptyFilteredTitle' : 'emptyTitle')}</strong></p>
+        <p class="muted">${t(filtered ? 'emptyFilteredHint' : 'emptyHint')}</p>
       </div>`;
   }
 
@@ -216,7 +228,7 @@ async function renderCompare() {
   const g = compareGroup();
   if (!g) {
     closeCompare();
-    if (state.compareIds) showToast('Ya no quedan duplicadas en ese grupo.');
+    if (state.compareIds) showToast(t('noDupesLeft'));
     return;
   }
   state.compareIds = g.tabs.map((t) => t.id);
@@ -239,43 +251,42 @@ async function renderCompare() {
       <section class="cmp-col ${tab.id === keeper.id ? 'is-keeper' : ''}" data-tab="${tab.id}">
         <div class="shot">
           ${shot
-            ? `<img src="${shot.data}" alt="Captura de la página"><span class="shot-age">captura ${timeAgo(shot.t)}</span>`
-            : `<div class="shot-empty"><span class="muted">Sin captura</span><button class="btn small" data-action="capture-one">Capturar</button></div>`}
+            ? `<img src="${shot.data}" alt="${h(t('shotAlt'))}"><span class="shot-age">${t('shotAge', timeAgo(shot.t))}</span>`
+            : `<div class="shot-empty"><span class="muted">${t('noShot')}</span><button class="btn small" data-action="capture-one">${t('capture')}</button></div>`}
         </div>
-        <h3 class="cmp-title" title="${h(tab.title)}">${repeated.has(tab.norm) ? repeatedChip + ' ' : ''}${h(tab.title || tab.url)}</h3>
+        <h3 class="cmp-title" title="${h(tab.title)}">${repeated.has(tab.norm) ? repeatedChip() + ' ' : ''}${h(tab.title || tab.url)}</h3>
         <a class="cmp-url" href="${h(tab.url)}" data-action="go" title="${h(tab.url)}">${h(tab.url)}</a>
         <dl class="cmp-facts">
-          <dt>Capítulo</dt>
-          <dd>${tab.chapter ?? '—'} ${chaptersDiffer && tab.chapter === maxChapter ? '<span class="chip ok">Más avanzado</span>' : ''}</dd>
-          <dt>Última visita</dt>
-          <dd>${timeAgo(tab.lastAccessed)} ${g.tabs.length > 1 && tab.lastAccessed === maxVisit ? '<span class="chip ok">Más reciente</span>' : ''}</dd>
-          <dt>Leído</dt>
+          <dt>${t('factChapter')}</dt>
+          <dd>${tab.chapter ?? (tab.workPage ? t('workPage') : '—')} ${chaptersDiffer && tab.chapter === maxChapter ? `<span class="chip ok">${t('mostAdvanced')}</span>` : ''}</dd>
+          <dt>${t('factLastVisit')}</dt>
+          <dd>${timeAgo(tab.lastAccessed)} ${g.tabs.length > 1 && tab.lastAccessed === maxVisit ? `<span class="chip ok">${t('mostRecent')}</span>` : ''}</dd>
+          <dt>${t('factRead')}</dt>
           <dd>${scroll
-            ? `<span class="bar"><span style="width:${scroll.pct}%"></span></span> ${scroll.pct} %
-               ${scroll.pct === maxScroll && maxScroll > 0 ? '<span class="chip ok">Más leído</span>' : ''}
-               <small class="muted">${scroll.live ? 'ahora' : `guardado ${timeAgo(scroll.t)}`}</small>`
-            : '<span class="muted">Sin datos (recarga la pestaña o desplázate en ella)</span>'}</dd>
-          <dt>Ubicación</dt>
-          <dd>${h(windowLabel(tab))} ${tabGroupChip(tab)}${tab.pinned ? ' · fijada' : ''}${tab.discarded ? ' · dormida' : ''}</dd>
+            ? `<span class="bar"><span style="width:${scroll.pct}%"></span></span> ${t('pct', scroll.pct)}
+               ${scroll.pct === maxScroll && maxScroll > 0 ? `<span class="chip ok">${t('mostRead')}</span>` : ''}
+               <small class="muted">${scroll.live ? t('readNow') : t('readSaved', timeAgo(scroll.t))}</small>`
+            : `<span class="muted">${t('noScrollData')}</span>`}</dd>
+          ${locationOf(tab) ? `<dt>${t('factLocation')}</dt><dd>${locationOf(tab)}</dd>` : ''}
         </dl>
         <div class="cmp-actions">
-          <button class="btn small" data-action="go">Ir</button>
-          <button class="btn small danger" data-action="close-tab">Cerrar esta</button>
-          <button class="btn small primary" data-action="keep-only">Quedarme solo con esta</button>
+          <button class="btn small" data-action="go">${t('go')}</button>
+          <button class="btn small danger" data-action="close-tab">${t('closeThis')}</button>
+          <button class="btn small primary" data-action="keep-only">${t('keepOnly')}</button>
         </div>
       </section>`;
   };
 
   $compare.innerHTML = `
-    <div class="cmp-panel" role="dialog" aria-modal="true" aria-label="Comparar pestañas">
+    <div class="cmp-panel" role="dialog" aria-modal="true" aria-label="${h(t('compareAria'))}">
       <header class="cmp-head">
         <div>
           <h2>${h(g.label)}</h2>
-          <p class="muted">${h(g.host)} · ${g.tabs.length} pestañas · ${g.kind === 'exact' ? 'idénticas' : 'misma obra'}</p>
+          <p class="muted">${h(g.host)} · ${tn('tabsCount', g.tabs.length)} · ${t(g.kind === 'exact' ? 'kindExactLower' : 'kindSimilarLower')}</p>
         </div>
         <span class="spacer"></span>
-        <button class="btn small" data-action="capture-all" title="Activa cada pestaña un momento para hacerle una captura">Actualizar capturas</button>
-        <button class="btn small" data-action="close-compare" aria-label="Cerrar comparación">✕</button>
+        <button class="btn small" data-action="capture-all" title="${h(t('refreshShotsTitle'))}">${t('refreshShots')}</button>
+        <button class="btn small" data-action="close-compare" aria-label="${h(t('closeCompareAria'))}">✕</button>
       </header>
       <div class="cmp-cols">${g.tabs.map(column).join('')}</div>
     </div>`;
@@ -303,9 +314,9 @@ function closeCompare() {
 }
 
 async function captureNow(tabIds) {
-  showToast('Capturando… las pestañas se activarán un momento.');
+  showToast(t('capturing'));
   await chrome.runtime.sendMessage({ type: 'captureTabs', tabIds, returnTabId: state.myTabId });
-  showToast('Capturas actualizadas.');
+  showToast(t('capturesUpdated'));
   if (state.compareIds) openCompare(state.compareIds);
 }
 
@@ -316,16 +327,16 @@ function confirmClose(tabs, { title, note } = {}) {
   const listed = tabs.slice(0, MAX_LISTED);
   $confirm.innerHTML = `
     <form method="dialog">
-      <h2>${h(title ?? `¿Cerrar ${tabs.length} ${tabs.length === 1 ? 'pestaña' : 'pestañas'}?`)}</h2>
+      <h2>${h(title ?? tn('confirmClose', tabs.length))}</h2>
       ${note ? `<p class="muted">${note}</p>` : ''}
       <ul class="confirm-list">
-        ${listed.map((t) => `<li>${favicon(t)}<span>${h(t.title || t.url)}</span>${t.chapter != null ? `<small class="muted">Cap. ${t.chapter}</small>` : ''}</li>`).join('')}
-        ${tabs.length > MAX_LISTED ? `<li class="muted">y ${tabs.length - MAX_LISTED} más…</li>` : ''}
+        ${listed.map((tab) => `<li>${favicon(tab)}<span>${h(tab.title || tab.url)}</span>${tab.chapter != null ? `<small class="muted">${t('chapterShort', tab.chapter)}</small>` : ''}</li>`).join('')}
+        ${tabs.length > MAX_LISTED ? `<li class="muted">${t('andMore', tabs.length - MAX_LISTED)}</li>` : ''}
       </ul>
-      <p class="muted small">Podrás deshacerlo justo después.</p>
+      <p class="muted small">${t('undoHint')}</p>
       <div class="confirm-actions">
-        <button class="btn" value="cancel">Cancelar</button>
-        <button class="btn primary" value="ok" autofocus>Cerrar ${tabs.length}</button>
+        <button class="btn" value="cancel">${t('cancel')}</button>
+        <button class="btn primary" value="ok" autofocus>${t('confirmCloseN', tabs.length)}</button>
       </div>
     </form>`;
   // Al cerrar con Esc se mantiene el returnValue anterior: hay que vaciarlo.
@@ -340,8 +351,8 @@ async function closeWithUndo(tabs) {
   if (!tabs.length) return;
   tabs.forEach((t) => state.selected.delete(t.id));
   const restore = await closeTabs(tabs);
-  showToast(`${tabs.length === 1 ? 'Cerrada 1 pestaña' : `Cerradas ${tabs.length} pestañas`}.`, {
-    label: 'Deshacer',
+  showToast(tn('closedTabs', tabs.length), {
+    label: t('undo'),
     run: () => reopenTabs(restore),
   });
 }
@@ -354,8 +365,8 @@ async function confirmAndClose(ids, options) {
 
 const keepNote = (keepers) =>
   keepers.length === 1
-    ? `Se conserva: <strong>${h(keepers[0].title)}</strong>. Las fijadas nunca se cierran.`
-    : `Se conserva una pestaña por grupo (${h(KEEP_RULES[rule()].toLowerCase())}). Las fijadas nunca se cierran.`;
+    ? t('keepNoteOne', h(keepers[0].title))
+    : t('keepNoteMany', h(t(KEEP_RULES[rule()])));
 
 // ---------- Aviso con deshacer ----------
 
@@ -430,14 +441,14 @@ document.addEventListener('click', async (e) => {
 });
 
 $('close-selected').addEventListener('click', () =>
-  confirmAndClose([...state.selected], { note: 'Has elegido estas pestañas a mano.' }),
+  confirmAndClose([...state.selected], { note: t('manualNote') }),
 );
 
 $('close-all-dupes').addEventListener('click', () => {
   const ids = state.visible.flatMap((g) => duplicatesToClose(g, rule()));
   const keepers = state.visible.map((g) => pickKeeper(g.tabs, rule()));
   confirmAndClose(ids, {
-    title: `¿Cerrar ${ids.length} duplicadas de ${state.visible.length} ${state.visible.length === 1 ? 'grupo' : 'grupos'}?`,
+    title: t('confirmCloseAll', tn('dupes', ids.length), tn('groups', state.visible.length)),
     note: keepNote(keepers),
   });
 });
@@ -468,7 +479,8 @@ document.addEventListener('keydown', (e) => {
 
 chrome.tabs.onCreated.addListener(scheduleRefresh);
 chrome.tabs.onRemoved.addListener(scheduleRefresh);
-chrome.tabs.onMoved.addListener(scheduleRefresh);
+// onMoved y las APIs windows / tabGroups no existen en Firefox para Android.
+chrome.tabs.onMoved?.addListener(scheduleRefresh);
 chrome.tabs.onAttached.addListener(scheduleRefresh);
 chrome.tabs.onDetached.addListener(scheduleRefresh);
 chrome.tabs.onActivated.addListener(scheduleRefresh);
@@ -476,8 +488,8 @@ chrome.tabs.onUpdated.addListener((_id, info) => {
   if ('url' in info || 'title' in info || 'pinned' in info || 'discarded' in info || 'groupId' in info) scheduleRefresh();
 });
 chrome.tabGroups?.onUpdated.addListener(scheduleRefresh);
-chrome.windows.onCreated.addListener(scheduleRefresh);
-chrome.windows.onRemoved.addListener(scheduleRefresh);
+chrome.windows?.onCreated.addListener(scheduleRefresh);
+chrome.windows?.onRemoved.addListener(scheduleRefresh);
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
   const keys = Object.keys(changes);
@@ -494,7 +506,7 @@ async function renderAccess() {
 $('grant-access').addEventListener('click', async () => {
   if (await requestSiteAccess()) {
     $('access').hidden = true;
-    showToast('Acceso concedido. Las capturas y el scroll empezarán a guardarse.');
+    showToast(t('accessGranted'));
   }
 });
 chrome.permissions.onAdded.addListener(renderAccess);
@@ -502,10 +514,12 @@ chrome.permissions.onRemoved.addListener(renderAccess);
 
 // ---------- Inicio ----------
 
+localizePage();
+if (await isMobile()) document.documentElement.classList.add('is-mobile');
 state.settings = await getSettings();
 state.myTabId = (await chrome.tabs.getCurrent())?.id ?? null;
 $('keep-rule').innerHTML = Object.entries(KEEP_RULES)
-  .map(([v, label]) => `<option value="${v}" ${v === state.settings.keepRule ? 'selected' : ''}>${h(label.toLowerCase())}</option>`)
+  .map(([v, key]) => `<option value="${v}" ${v === state.settings.keepRule ? 'selected' : ''}>${h(t(key))}</option>`)
   .join('');
 $('auto-capture').checked = state.settings.autoCapture;
 

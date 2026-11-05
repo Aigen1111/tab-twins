@@ -9,14 +9,11 @@ Guía para el mantenedor: qué hacer antes de abrir el repositorio al público y
 - [x] Política de privacidad (`PRIVACY.md`). Las tiendas piden un enlace a ella.
 - [x] CHANGELOG.
 - [x] Tests en GitHub Actions y release automática al etiquetar.
-- [x] Historial revisado: no hay secretos en los archivos.
-- [ ] **Correo en los commits.** La mayoría de commits llevan tu nombre completo y tu correo personal, que se ven en un repositorio público. Opciones:
-  - Dejarlo así.
-  - Usar el correo `noreply` de GitHub en adelante: `git config user.email "80778930+Aigen1111@users.noreply.github.com"` dentro del repo, y activar en GitHub › Settings › Emails «Keep my email addresses private».
-  - Reescribir el historial para cambiar los commits ya hechos (requiere un push forzado a `main`; decidirlo antes de hacerlo público).
-- [ ] **ID de Firefox definitivo.** Ahora es `tab-twins@local` (en `manifest.json`, `browser_specific_settings.gecko.id`). En Firefox Add-ons el ID es permanente: cámbialo antes de la primera subida. Formato recomendado: `tab-twins@<algo-tuyo>` con forma de correo, aunque no tiene que existir.
-- [ ] **Titular del copyright** en `LICENSE` (ahora `Aigen1111`). Puedes poner tu nombre o dejar el usuario de GitHub.
-- [ ] Hacer público el repositorio: GitHub › Settings › General › Danger Zone › Change visibility.
+- [x] Historial revisado: no hay secretos en los archivos (Gitleaks, 2026-11-05).
+- [x] **Correo en los commits.** Decidido: correo `noreply` de GitHub en adelante (`git config user.email "80778930+Aigen1111@users.noreply.github.com"` dentro del repo). Los commits anteriores conservan el correo personal; no se reescribe el historial. Falta activar en GitHub › Settings › Emails «Keep my email addresses private» y «Block command line pushes that expose my email».
+- [x] **ID de Firefox definitivo:** `tab-twins@needyfriends` (en `manifest.json`, `browser_specific_settings.gecko.id`). En Firefox Add-ons el ID es permanente: no lo cambies después de la primera subida.
+- [x] **Titular del copyright** en `LICENSE`: NeedyFriends.
+- [ ] Hacer público el repositorio: GitHub › Settings › General › Danger Zone › Change visibility, o `gh repo edit Aigen1111/tab-twins --visibility public --accept-visibility-change-consequences`.
 
 ## 2. Publicar una versión con descargas
 

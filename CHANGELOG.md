@@ -13,6 +13,7 @@
 
 - The synopsis or series page of a novel is now grouped with its open chapters, so "Close duplicates" keeps only the chapter chosen by the rule.
 - The window label is only shown when more than one window is open, and the tab-group filter only when there are tab groups.
+- Final Firefox add-on ID: `tab-twins@needyfriends`.
 
 ## 0.1.0 — 2026-10-22
 
